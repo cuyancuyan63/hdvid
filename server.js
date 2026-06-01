@@ -15,7 +15,7 @@ if (!fs.existsSync("outputs"))
 const upload = multer({
     dest: "uploads/",
     limits: {
-        fileSize: 100 * 1024 * 1024 // 100MB
+        fileSize: 100 * 1024 * 1024
     }
 })
 
@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
     res.json({
         status: true,
         message: "HD Video API Online",
-        qualities: ["1k", "2k", "4k"]
+        qualities: ["1k", "2k"]
     })
 })
 
@@ -47,10 +47,6 @@ app.post("/hdvideo", upload.single("video"), async (req, res) => {
 
             case "2k":
                 scale = "-2:1440"
-                break
-
-            case "4k":
-                scale = "-2:2160"
                 break
 
             default:
@@ -85,12 +81,11 @@ app.post("/hdvideo", upload.single("video"), async (req, res) => {
                     fs.unlinkSync(input)
 
                 setTimeout(() => {
-                    if (fs.existsSync(output)) {
-                        try {
+                    try {
+                        if (fs.existsSync(output))
                             fs.unlinkSync(output)
-                        } catch {}
-                    }
-                }, 300000) // 5 menit
+                    } catch {}
+                }, 300000)
 
                 res.json({
                     status: true,
@@ -99,6 +94,7 @@ app.post("/hdvideo", upload.single("video"), async (req, res) => {
                 })
             })
             .on("error", err => {
+
                 console.log(err)
 
                 if (fs.existsSync(input))
